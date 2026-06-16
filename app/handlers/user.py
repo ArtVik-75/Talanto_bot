@@ -8,7 +8,7 @@ from aiogram import Bot
 from app.keyboards.reply import main_keyboard
 from app.keyboards.services import services_keyboard
 from app.keyboards.trainers import trainers_keyboard
-from app.keyboards.trainers import latina_keyboard
+from app.keyboards.latina import latina_keyboard
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
 from app.constants.services import LATINA
