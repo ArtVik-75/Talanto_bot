@@ -24,7 +24,7 @@ async def cmd_start(message: Message):
 
     )
 
-@router.message(F.text == "Записаться")
+@router.message(F.text == "💃 Записаться")
 async def choose_service(message: Message, state: FSMContext):
 
     await state.set_state(Form.service)
