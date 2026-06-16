@@ -52,6 +52,7 @@ async def get_service(message: Message, state: FSMContext):
     
     elif message.text == LATINA:
 
+        await state.update_data(trainer="-")
         await state.set_state(Form.name)
 
         await message.answer(
@@ -85,7 +86,7 @@ async def get_name(message: Message, state: FSMContext):
     await state.set_state(Form.age)
 
     await message.answer(
-        "Введите ваш возраст цифрами"
+        "Введите ваш возраст цифрами:"
     )
 
 @router.message(Form.age)
