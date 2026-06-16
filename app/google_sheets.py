@@ -21,8 +21,8 @@ client = gspread.authorize(creds)
 
 sheet = client.open("Заявки ТАЛАНТО").sheet1
 
-def add_application(username, telegram_id, service, trainer, name, age, phone, days, time, wishes):
+def add_application(username, telegram_id, service, trainer, name, age, experience, experience_details, phone, days, time, wishes):
          
-    sheet.append_row([datetime.now().strftime("%d.%m.%Y %H:%M"), username, telegram_id, service, trainer, name, age, phone, days, time, wishes])
+    sheet.append_row([datetime.now().strftime("%d.%m.%Y %H:%M"), username, telegram_id, service, trainer, name, age, experience, experience_details, phone, days, time, wishes])
 
     

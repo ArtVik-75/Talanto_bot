@@ -1,6 +1,5 @@
 from aiogram.fsm.state import State, StatesGroup
 
-
 class Form(StatesGroup):
     service = State()
     trainer = State()
@@ -8,6 +7,10 @@ class Form(StatesGroup):
 
     name = State()
     age = State()
+
+    experience = State()
+    experience_details = State()
+
     phone = State()
 
     days = State()

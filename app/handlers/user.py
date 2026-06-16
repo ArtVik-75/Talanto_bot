@@ -9,6 +9,7 @@ from app.keyboards.reply import main_keyboard
 from app.keyboards.services import services_keyboard
 from app.keyboards.trainers import trainers_keyboard
 from app.keyboards.latina import latina_keyboard
+from app.keyboards.experience import experience_keyboard
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
 from app.constants.services import LATINA
@@ -98,10 +99,53 @@ async def get_age(message: Message, state: FSMContext):
 
     await state.update_data(age=int(message.text))
 
+    await state.set_state(Form.experience)
+
+    await message.answer(
+        "Есть ли у вас танцевальный опыт?",
+        reply_markup=experience_keyboard
+    )
+
+@router.message(Form.experience)
+async def get_experience(message: Message, state: FSMContext):
+
+    if message.text == "✅ Есть опыт":
+
+        await state.update_data(experience="Есть")
+
+        await state.set_state(Form.experience_details)
+
+        await message.answer(
+            "Расскажите кратко о своем опыте"
+        )    
+
+    elif message.text == "❌ Нет опыта":
+
+        await state.update_data(experience=message.text)
+        await state.update_data(experience_details="-")
+
+        await state.set_state(Form.phone)
+
+        await message.answer(
+            "Введите ваш номер телефона в формате +7/8 (11 цифр)"
+        )
+
+    else:
+        
+        await message.answer(
+            "Пожалуйста, воспользуйтесь кнопками ниже",
+            reply_markup=experience_keyboard
+        )
+
+@router.message(Form.experience_details)
+async def get_experience_details(message: Message, state: FSMContext):
+
+    await state.update_data(experience_details=message.text)
+
     await state.set_state(Form.phone)
 
     await message.answer(
-        "Введите ваш номер телефона в формате +7/8"
+        "Введите ваш номер телефона в формате +7/8 (11 цифр)"
     )
 
 @router.message(Form.phone)
@@ -209,6 +253,8 @@ async def get_wishes(message: Message, state: FSMContext):
         trainer,
         data["name"],
         data["age"],
+        data["experience"],
+        data["experience_details"],
         data["phone"],
         data["days"],
         data["time"],
@@ -221,6 +267,8 @@ async def get_wishes(message: Message, state: FSMContext):
         f"Тренер: {data['trainer']}\n\n"
         f"Имя: {data['name']}\n"
         f"Возраст: {data['age']}\n"
+        f"Опыт: {data['experience']}\n"
+        f"Об опыте: {data['experience_details']}\n"
         f"Телефон: {data['phone']}\n\n"
         f"Дни: {data['days']}\n"
         f"Время: {data['time']}\n"
@@ -236,6 +284,8 @@ async def get_wishes(message: Message, state: FSMContext):
         f"Тренер: {data['trainer']}\n\n"
         f"Имя: {data['name']}\n"
         f"Возраст: {data['age']}\n"
+        f"Опыт: {data['experience']}\n"
+        f"Об опыте: {data['experience_details']}\n"
         f"Телефон: {data['phone']}\n\n"
         f"Дни: {data['days']}\n"
         f"Время: {data['time']}\n"
