@@ -5,7 +5,9 @@ from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram import Bot
 
-from app.keyboards.reply import main_keyboard, services_keyboard, trainers_keyboard
+from app.keyboards.reply import main_keyboard
+from app.keyboards.services import services_keyboard
+from app.keyboards.trainers import trainers_keyboard
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
 from app.google_sheets import add_application
