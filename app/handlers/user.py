@@ -8,8 +8,10 @@ from aiogram import Bot
 from app.keyboards.reply import main_keyboard
 from app.keyboards.services import services_keyboard
 from app.keyboards.trainers import trainers_keyboard
+from app.keyboards.trainers import latina_keyboard
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
+from app.constants.services import LATINA
 from app.google_sheets import add_application
 from app.config import ADMIN_ID
 
@@ -48,6 +50,14 @@ async def get_service(message: Message, state: FSMContext):
             reply_markup=trainers_keyboard
         )
     
+    elif message.text == LATINA:
+
+        await state.set_state(Form.name)
+
+        await message.answer(
+            "Введите ваше имя"
+        )
+
     else:
         
         await state.set_state(Form.name)
@@ -121,21 +131,49 @@ async def get_phone(message: Message, state: FSMContext):
 
     await state.update_data(phone=phone)
 
-    await state.set_state(Form.days)
+    data = await state.get_data()
 
-    await message.answer(
+    if data["service"] == LATINA:
+
+        await state.set_state(Form.days)
+
+        await message.answer(
+            "Выберите удобный день для посещения группы:",
+            reply_markup=latina_keyboard
+        )
+            
+    else:
+        await state.set_state(Form.days)
+
+        await message.answer(
         "Какие дни вам удобны для занятий?\n\n"
-        "Например: Пн, Вт, Ср или Будние дни после 18:00"
+        "Например: Пн, Вт или Будние дни после 18:00"
     )
 
 @router.message(Form.days)
 async def get_days(message: Message, state: FSMContext):
 
-    await state.update_data(days=message.text)
+    data = await state.get_data()
 
-    await state.set_state(Form.time)
+    if data["service"] == LATINA:
 
-    await message.answer(
+        await state.update_data(days=message.text)
+        await state.update_data(time="20:00")
+
+        await state.set_state(Form.wishes)
+
+        await message.answer(
+            "Будут ли у вас какие-то пожелания?\n\n"
+            "Например: хочу отработать связку перед турниром"
+        )
+
+    else:
+
+        await state.update_data(days=message.text)
+
+        await state.set_state(Form.time)
+
+        await message.answer(
         "В какое время вам будет удобно прийти на занятия?\n\n"
         "Например: в 17:00"
     )
