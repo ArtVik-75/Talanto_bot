@@ -1,10 +1,9 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-experience_keyboard = ReplyKeyboardMarkup(
+menu_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="✅ Есть опыт")],
-        [KeyboardButton(text="❌ Нет опыта")],
         [KeyboardButton(text="🏠 Главное меню")]
     ],
     resize_keyboard=True
+
 )

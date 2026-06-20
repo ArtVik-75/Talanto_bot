@@ -6,7 +6,7 @@ services_keyboard = ReplyKeyboardMarkup(
         [KeyboardButton(text="🔥 Женская латина")],
         [KeyboardButton(text="👶 Детская группа")],
         [KeyboardButton(text="🏆 Переход в клуб")],
-        [KeyboardButton(text="🎁 Пробное занятие")]
+        [KeyboardButton(text="🏠 Главное меню")]
     ],
     resize_keyboard=True
 )

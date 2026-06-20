@@ -10,6 +10,7 @@ from app.keyboards.services import services_keyboard
 from app.keyboards.trainers import trainers_keyboard
 from app.keyboards.latina import latina_keyboard
 from app.keyboards.experience import experience_keyboard
+from app.keyboards.menu import menu_keyboard
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
 from app.constants.services import LATINA
@@ -27,6 +28,76 @@ async def cmd_start(message: Message):
         "Выберите дейтсвие, которое вам необходимо:",
         reply_markup=main_keyboard
 
+    )
+
+@router.message(F.text == "🏠 Главное меню")
+async def back_to_menu(message: Message, state: FSMContext):
+
+    await state.clear()
+
+    await message.answer(
+        "Выберите действие:",
+        reply_markup=main_keyboard
+    )
+
+@router.message(F.text == "📅 Расписание")
+async def schedule(message: Message):
+
+    await message.answer(
+
+    "📅 Расписание занятий\n\n"
+
+    "🔥 Женская латина\n"
+    "• Понедельник — 20:00\n"
+    "• Четверг — 20:00\n\n"
+
+    "👶 Детская группа\n"
+    "• Вторник — 18:00\n"
+    "• Пятница — 18:00\n\n"
+
+    "👩 Индивидуальные тренировки\n"
+    "• По согласованию с тренером",
+    reply_markup=menu_keyboard
+    )
+
+@router.message(F.text == "🏆 О клубе")
+async def about(message: Message):
+
+    await message.answer(
+
+        "Школа танцев ТАЛАНТО — это пространство для развития, творчества и любви к танцу.\n\n"
+
+        "Мы работаем с детьми и взрослыми, проводим групповые и индивидуальные занятия, готовим спортсменов к соревнованиям и помогаем каждому раскрыть свой потенциал.\n\n"
+
+        "Наши направления:\n"
+        "• Женская латина\n"
+        "• Детские группы\n"
+        "• Индивидуальные тренировки\n"
+        "• Подготовка спортсменов\n\n"
+
+        "Будем рады видеть вас на занятиях ❤️",
+        reply_markup=menu_keyboard
+    )
+
+@router.message(F.text == "📞 Контакты")
+async def contact(message: Message):
+
+    await message.answer(
+        "📍 Адрес:\n"
+        "ул. Багульниковая 35\n\n"
+
+        "📞 Телефон:\n"
+        "+7 ...\n"
+
+        "📱 Telegram:\n"
+        "@...\n"
+
+        "📷 Instagram:\n"
+        "...\n"
+
+        "🕒 Время работы:\n"
+        "ежедневно с 10:00\n",
+        reply_markup=menu_keyboard
     )
 
 @router.message(F.text == "💃 Записаться")
@@ -59,7 +130,8 @@ async def get_service(message: Message, state: FSMContext):
         await state.set_state(Form.name)
 
         await message.answer(
-            "Введите ваше имя:"
+            "Введите ваше имя:",
+            reply_markup=menu_keyboard
         )
 
     elif message.text == CHILDREN:
@@ -68,7 +140,8 @@ async def get_service(message: Message, state: FSMContext):
         await state.set_state(Form.name)
 
         await message.answer(
-            "Введите имя родителя:"
+            "Введите имя родителя:",
+            reply_markup=menu_keyboard
         )
 
     elif message.text == TRANSFER:
@@ -77,7 +150,8 @@ async def get_service(message: Message, state: FSMContext):
         await state.set_state(Form.name)
 
         await message.answer(
-            "Введите ваше имя:"
+            "Введите ваше имя:",
+            reply_markup=menu_keyboard
         )
 
     else:
@@ -86,6 +160,7 @@ async def get_service(message: Message, state: FSMContext):
 
         await message.answer(
         "Введите ваше имя:",
+        reply_markup=menu_keyboard
     )
 
 @router.message(Form.trainer)
@@ -96,7 +171,8 @@ async def get_trainer(message: Message, state: FSMContext):
     await state.set_state(Form.name)
 
     await message.answer(
-        "Введите ваше имя:"
+        "Введите ваше имя:",
+        reply_markup=menu_keyboard
     )
 
 @router.message(Form.name)
@@ -111,7 +187,8 @@ async def get_name(message: Message, state: FSMContext):
         await state.set_state(Form.child_name)
 
         await message.answer(
-            "Введите имя ребенка:"
+            "Введите имя ребенка:",
+            reply_markup=menu_keyboard
         )
 
     else:
@@ -119,7 +196,8 @@ async def get_name(message: Message, state: FSMContext):
         await state.set_state(Form.age)
 
         await message.answer(
-        "Введите ваш возраст цифрами:"
+        "Введите ваш возраст цифрами:",
+        reply_markup=menu_keyboard
         )
 
 
@@ -131,7 +209,8 @@ async def get_child_name(message: Message, state: FSMContext):
     await state.set_state(Form.age)
 
     await message.answer(
-        "Введите возраст ребенка:"
+        "Введите возраст ребенка:",
+        reply_markup=menu_keyboard
     )
 
 @router.message(Form.age)
@@ -171,7 +250,8 @@ async def get_experience(message: Message, state: FSMContext):
         await state.set_state(Form.experience_details)
 
         await message.answer(
-            "Расскажите кратко о танцевальном опыте"
+            "Расскажите кратко о танцевальном опыте:",
+            reply_markup=menu_keyboard
         )    
 
     elif message.text == "❌ Нет опыта":
@@ -182,7 +262,8 @@ async def get_experience(message: Message, state: FSMContext):
         await state.set_state(Form.phone)
 
         await message.answer(
-            "Введите ваш номер телефона в формате +7/8 (11 цифр)"
+            "Введите ваш номер телефона в формате +7/8 (11 цифр)",
+            reply_markup=menu_keyboard
         )
 
     else:
@@ -200,7 +281,8 @@ async def get_experience_details(message: Message, state: FSMContext):
     await state.set_state(Form.phone)
 
     await message.answer(
-        "Введите ваш номер телефона в формате +7/8 (11 цифр)"
+        "Введите ваш номер телефона в формате +7/8 (11 цифр)",
+        reply_markup=menu_keyboard
     )
 
 @router.message(Form.phone)
@@ -247,7 +329,8 @@ async def get_phone(message: Message, state: FSMContext):
         await state.set_state(Form.club_reason)
 
         await message.answer(
-            "Расскажите немного о себе и почему хотите перейти к нам в клуб:"
+            "Расскажите немного о себе и почему хотите перейти к нам в клуб:",
+            reply_markup=menu_keyboard
         )
             
     else:
@@ -255,7 +338,8 @@ async def get_phone(message: Message, state: FSMContext):
 
         await message.answer(
         "Какие дни вам удобны для занятий?\n\n"
-        "Например: Пн, Вт или Будние дни после 18:00"
+        "Например: Пн, Вт или Будние дни после 18:00",
+        reply_markup=menu_keyboard
     )
         
 @router.message(Form.club_reason)
@@ -266,7 +350,8 @@ async def get_clud_reason(message: Message, state: FSMContext):
     await state.set_state(Form.wishes)
 
     await message.answer(
-        "Будут ли у вас какие-то особые пожелания?"
+        "Будут ли у вас какие-то особые пожелания?",
+        reply_markup=menu_keyboard
     )
 
 @router.message(Form.days)
@@ -283,7 +368,8 @@ async def get_days(message: Message, state: FSMContext):
 
         await message.answer(
             "Будут ли у вас какие-то пожелания?\n\n"
-            "Например: хочу отработать связку перед турниром"
+            "Например: хочу отработать связку перед турниром",
+            reply_markup=menu_keyboard
         )
 
     else:
@@ -294,7 +380,8 @@ async def get_days(message: Message, state: FSMContext):
 
         await message.answer(
         "В какое время вам будет удобно прийти на занятия?\n\n"
-        "Например: в 17:00"
+        "Например: в 17:00",
+        reply_markup=menu_keyboard
     )
 
 @router.message(Form.time)
@@ -306,7 +393,8 @@ async def get_time(message: Message, state: FSMContext):
 
     await message.answer(
         "Будут ли у вас какие-то пожелания?\n\n"
-        "Например: хочу отработать связку перед турниром"
+        "Например: хочу отработать связку перед турниром",
+        reply_markup=menu_keyboard
     )
 
 @router.message(Form.wishes)

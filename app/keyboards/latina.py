@@ -4,7 +4,7 @@ latina_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="📅 Понедельник")],
         [KeyboardButton(text="📅 Четверг")],
-        [KeyboardButton(text="⬅️ Назад")]
+        [KeyboardButton(text="🏠 Главное меню")]
     ],
     resize_keyboard=True
 )

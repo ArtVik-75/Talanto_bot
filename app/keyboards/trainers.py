@@ -6,7 +6,7 @@ trainers_keyboard = ReplyKeyboardMarkup(
         [KeyboardButton(text="Анастасия")],
         [KeyboardButton(text="Мария")],
         [KeyboardButton(text="Даниил")],
-        [KeyboardButton(text="⬅️ Назад")]
+        [KeyboardButton(text="🏠 Главное меню")]
     ],
     resize_keyboard=True
 )
