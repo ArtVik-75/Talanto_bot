@@ -317,26 +317,31 @@ async def get_wishes(message: Message, state: FSMContext):
     data = await state.get_data()
 
     trainer = data.get("trainer", "-")
+    child_name = data.get("child_name", "-")
+    club_reason = data.get("club_reason", "-")
+    days = data.get("days", "-")
+    time = data.get("time", "-")
     telegram_id = message.from_user.id
     username = message.from_user.username or "Не указан"
 
-    if data["service"] == CHILDREN:
-
-        add_application(
+    add_application(
         username,
         telegram_id,
         data["service"],
         trainer,
         data["name"],
-        data["child_name"],
+        child_name,
         data["age"],
         data["experience"],
         data["experience_details"],
         data["phone"],
-        data["days"],
-        data["time"],
+        club_reason,
+        days,
+        time,
         data["wishes"]
         )
+
+    if data["service"] == CHILDREN:
 
         await message.answer(
         f"Спасибо за заявку! Скоро мы с вами свяжемся\n\n"
@@ -374,20 +379,6 @@ async def get_wishes(message: Message, state: FSMContext):
         
     elif data["service"] == TRANSFER:
 
-        add_application(
-        username,
-        telegram_id,
-        data["service"],
-        trainer,
-        data["name"],
-        data["age"],
-        data["experience"],
-        data["experience_details"],
-        data["phone"],
-        data["club_reason"],
-        data["wishes"]
-        )
-
         await message.answer(
         f"Спасибо за заявку! Скоро мы с вами свяжемся\n\n"
         f"Направление: {data['service']}\n"
@@ -413,30 +404,12 @@ async def get_wishes(message: Message, state: FSMContext):
         f"Опыт: {data['experience']}\n"
         f"Об опыте: {data['experience_details']}\n"
         f"Телефон: {data['phone']}\n\n"
-        f"Телефон: {data['phone']}\n\n"
         f"Причина перехода: {data['club_reason']}\n"
         f"Пожелания: {data['wishes']}\n\n"
 
     )
 
-
-
     else:
-
-        add_application(
-        username,
-        telegram_id,
-        data["service"],
-        trainer,
-        data["name"],
-        data["age"],
-        data["experience"],
-        data["experience_details"],
-        data["phone"],
-        data["days"],
-        data["time"],
-        data["wishes"]
-        )
 
         await message.answer(
         f"Спасибо за заявку! Скоро мы с вами свяжемся\n\n"
