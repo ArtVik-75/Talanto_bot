@@ -11,6 +11,7 @@ from app.keyboards.trainers import trainers_keyboard
 from app.keyboards.latina import latina_keyboard
 from app.keyboards.experience import experience_keyboard
 from app.keyboards.menu import menu_keyboard
+from app.keyboards.group import group_keyboard 
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
 from app.constants.services import LATINA
@@ -332,7 +333,15 @@ async def get_phone(message: Message, state: FSMContext):
             "Расскажите немного о себе и почему хотите перейти к нам в клуб:",
             reply_markup=menu_keyboard
         )
-            
+    
+    elif data["service"] == CHILDREN:
+
+        await state.set_state(Form.group_days)
+
+        await message.answer(
+            "У нас есть две группы, выберите подходящую вам по дням"
+        )
+
     else:
         await state.set_state(Form.days)
 
@@ -342,6 +351,17 @@ async def get_phone(message: Message, state: FSMContext):
         reply_markup=menu_keyboard
     )
         
+@router.message(Form.group_days)
+async def get_group_days(message: Message, state: FSMContext):
+
+    await state.update_data(group_days=message.text)
+
+    await state.set_state(Form.wishes)
+
+    await message.answer(
+        reply_markup=group_keyboard
+    )
+
 @router.message(Form.club_reason)
 async def get_clud_reason(message: Message, state: FSMContext):
 
@@ -405,6 +425,7 @@ async def get_wishes(message: Message, state: FSMContext):
     data = await state.get_data()
 
     trainer = data.get("trainer", "-")
+    group_days = data.get("group.days", "-")
     child_name = data.get("child_name", "-")
     club_reason = data.get("club_reason", "-")
     days = data.get("days", "-")
@@ -424,6 +445,7 @@ async def get_wishes(message: Message, state: FSMContext):
         data["experience_details"],
         data["phone"],
         club_reason,
+        group_days,
         days,
         time,
         data["wishes"]
@@ -441,8 +463,7 @@ async def get_wishes(message: Message, state: FSMContext):
         f"Опыт: {data['experience']}\n"
         f"Об опыте: {data['experience_details']}\n"
         f"Телефон: {data['phone']}\n\n"
-        f"Дни: {data['days']}\n"
-        f"Время: {data['time']}\n"
+        f"Подходящая группа: {group_days}\n"
         f"Пожелания: {data['wishes']}\n\n"
     )
 
@@ -459,8 +480,7 @@ async def get_wishes(message: Message, state: FSMContext):
         f"Опыт: {data['experience']}\n"
         f"Об опыте: {data['experience_details']}\n"
         f"Телефон: {data['phone']}\n\n"
-        f"Дни: {data['days']}\n"
-        f"Время: {data['time']}\n"
+        f"Подходящая группа: {group_days}\n"
         f"Пожелания: {data['wishes']}\n\n"
 
     )
