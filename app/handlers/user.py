@@ -13,6 +13,7 @@ from app.keyboards.experience import experience_keyboard
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
 from app.constants.services import LATINA
+from app.constants.services import CHILDREN
 from app.google_sheets import add_application
 from app.config import ADMIN_ID
 
@@ -60,6 +61,15 @@ async def get_service(message: Message, state: FSMContext):
             "Введите ваше имя"
         )
 
+    elif message.text == CHILDREN:
+
+        await state.update_data(trainer="-")
+        await state.set_state(Form.name)
+
+        await message.answer(
+            "Введите имя родителя"
+        )
+
     else:
         
         await state.set_state(Form.name)
@@ -84,24 +94,59 @@ async def get_name(message: Message, state: FSMContext):
 
     await state.update_data(name=message.text)
 
+    data = await state.get_data() 
+
+    if data["service"] == CHILDREN:
+
+        await state.set_state(Form.child_name)
+
+        await message.answer(
+            "Введите имя ребенка:"
+        )
+
+    else:
+
+        await state.set_state(Form.age)
+
+        await message.answer(
+        "Введите ваш возраст цифрами:"
+        )
+
+
+@router.message(Form.child_name)
+async def get_child_name(message: Message, state: FSMContext):
+
+    await state.update_data(child_name=message.text)
+
     await state.set_state(Form.age)
 
     await message.answer(
-        "Введите ваш возраст цифрами:"
+        "Введите возраст ребенка:"
     )
 
 @router.message(Form.age)
 async def get_age(message: Message, state: FSMContext):
 
+    data = await state.get_data()
+
     if not message.text.isdigit():
-        return await message.answer("Ошибка! Введите ваш возраст только цирами\n\n"
+        return await message.answer("Ошибка! Введите возраст только цирами\n\n"
                                     "Например: 25")
 
     await state.update_data(age=int(message.text))
 
     await state.set_state(Form.experience)
 
-    await message.answer(
+    if data["service"] == CHILDREN:
+        
+        await message.answer(
+            "Есть ли у ребенка танцевальный опыт?",
+            reply_markup=experience_keyboard
+        )
+
+    else:
+
+        await message.answer(
         "Есть ли у вас танцевальный опыт?",
         reply_markup=experience_keyboard
     )
@@ -116,7 +161,7 @@ async def get_experience(message: Message, state: FSMContext):
         await state.set_state(Form.experience_details)
 
         await message.answer(
-            "Расскажите кратко о своем опыте"
+            "Расскажите кратко о танцевальном опыте"
         )    
 
     elif message.text == "❌ Нет опыта":
@@ -246,7 +291,61 @@ async def get_wishes(message: Message, state: FSMContext):
     telegram_id = message.from_user.id
     username = message.from_user.username or "Не указан"
 
-    add_application(
+    if data["service"] == CHILDREN:
+
+        add_application(
+        username,
+        telegram_id,
+        data["service"],
+        trainer,
+        data["name"],
+        data["child_name"],
+        data["age"],
+        data["experience"],
+        data["experience_details"],
+        data["phone"],
+        data["days"],
+        data["time"],
+        data["wishes"]
+        )
+
+        await message.answer(
+        f"Спасибо за заявку! Скоро мы с вами свяжемся\n\n"
+        f"Направление: {data['service']}\n"
+        f"Тренер: {trainer}\n\n"
+        f"Имя: {data['name']}\n"
+        f"Имя ребенка: {data['child_name']}\n"
+        f"Возраст: {data['age']}\n"
+        f"Опыт: {data['experience']}\n"
+        f"Об опыте: {data['experience_details']}\n"
+        f"Телефон: {data['phone']}\n\n"
+        f"Дни: {data['days']}\n"
+        f"Время: {data['time']}\n"
+        f"Пожелания: {data['wishes']}\n\n"
+    )
+
+        await message.bot.send_message(
+        ADMIN_ID,
+        f"Новая заявка!\n\n"
+        f"Username: @{username}\n"
+        f"Telegram ID: {telegram_id}\n\n"
+        f"Направление: {data['service']}\n"
+        f"Тренер: {trainer}\n\n"
+        f"Имя: {data['name']}\n"
+        f"Имя ребенка: {data['child_name']}\n"
+        f"Возраст: {data['age']}\n"
+        f"Опыт: {data['experience']}\n"
+        f"Об опыте: {data['experience_details']}\n"
+        f"Телефон: {data['phone']}\n\n"
+        f"Дни: {data['days']}\n"
+        f"Время: {data['time']}\n"
+        f"Пожелания: {data['wishes']}\n\n"
+
+    )
+
+    else:
+
+        add_application(
         username,
         telegram_id,
         data["service"],
@@ -261,10 +360,10 @@ async def get_wishes(message: Message, state: FSMContext):
         data["wishes"]
         )
 
-    await message.answer(
+        await message.answer(
         f"Спасибо за заявку! Скоро мы с вами свяжемся\n\n"
         f"Направление: {data['service']}\n"
-        f"Тренер: {data['trainer']}\n\n"
+        f"Тренер: {trainer}\n\n"
         f"Имя: {data['name']}\n"
         f"Возраст: {data['age']}\n"
         f"Опыт: {data['experience']}\n"
@@ -275,13 +374,13 @@ async def get_wishes(message: Message, state: FSMContext):
         f"Пожелания: {data['wishes']}\n\n"
     )
     
-    await message.bot.send_message(
+        await message.bot.send_message(
         ADMIN_ID,
         f"Новая заявка!\n\n"
         f"Username: @{username}\n"
         f"Telegram ID: {telegram_id}\n\n"
         f"Направление: {data['service']}\n"
-        f"Тренер: {data['trainer']}\n\n"
+        f"Тренер: {trainer}\n\n"
         f"Имя: {data['name']}\n"
         f"Возраст: {data['age']}\n"
         f"Опыт: {data['experience']}\n"

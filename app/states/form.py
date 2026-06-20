@@ -6,6 +6,7 @@ class Form(StatesGroup):
     group = State()
 
     name = State()
+    child_name = State()
     age = State()
 
     experience = State()
