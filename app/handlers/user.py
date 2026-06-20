@@ -14,6 +14,7 @@ from app.states.form import Form
 from app.constants.services import INDIVIDUAL  
 from app.constants.services import LATINA
 from app.constants.services import CHILDREN
+from app.constants.services import TRANSFER
 from app.google_sheets import add_application
 from app.config import ADMIN_ID
 
@@ -58,7 +59,7 @@ async def get_service(message: Message, state: FSMContext):
         await state.set_state(Form.name)
 
         await message.answer(
-            "Введите ваше имя"
+            "Введите ваше имя:"
         )
 
     elif message.text == CHILDREN:
@@ -67,7 +68,16 @@ async def get_service(message: Message, state: FSMContext):
         await state.set_state(Form.name)
 
         await message.answer(
-            "Введите имя родителя"
+            "Введите имя родителя:"
+        )
+
+    elif message.text == TRANSFER:
+
+        await state.update_data(trainer="-")
+        await state.set_state(Form.name)
+
+        await message.answer(
+            "Введите ваше имя:"
         )
 
     else:
@@ -231,6 +241,14 @@ async def get_phone(message: Message, state: FSMContext):
             "Выберите удобный день для посещения группы:",
             reply_markup=latina_keyboard
         )
+
+    elif data["service"] == TRANSFER:
+
+        await state.set_state(Form.club_reason)
+
+        await message.answer(
+            "Расскажите немного о себе и почему хотите перейти к нам в клуб:"
+        )
             
     else:
         await state.set_state(Form.days)
@@ -238,6 +256,17 @@ async def get_phone(message: Message, state: FSMContext):
         await message.answer(
         "Какие дни вам удобны для занятий?\n\n"
         "Например: Пн, Вт или Будние дни после 18:00"
+    )
+        
+@router.message(Form.club_reason)
+async def get_clud_reason(message: Message, state: FSMContext):
+
+    await state.update_data(club_reason=message.text)
+
+    await state.set_state(Form.wishes)
+
+    await message.answer(
+        "Будут ли у вас какие-то особые пожелания?"
     )
 
 @router.message(Form.days)
@@ -342,6 +371,57 @@ async def get_wishes(message: Message, state: FSMContext):
         f"Пожелания: {data['wishes']}\n\n"
 
     )
+        
+    elif data["service"] == TRANSFER:
+
+        add_application(
+        username,
+        telegram_id,
+        data["service"],
+        trainer,
+        data["name"],
+        data["age"],
+        data["experience"],
+        data["experience_details"],
+        data["phone"],
+        data["club_reason"],
+        data["days"],
+        data["time"],
+        data["wishes"]
+        )
+
+        await message.answer(
+        f"Спасибо за заявку! Скоро мы с вами свяжемся\n\n"
+        f"Направление: {data['service']}\n"
+        f"Тренер: {trainer}\n\n"
+        f"Имя: {data['name']}\n"
+        f"Возраст: {data['age']}\n"
+        f"Опыт: {data['experience']}\n"
+        f"Об опыте: {data['experience_details']}\n"
+        f"Телефон: {data['phone']}\n\n"
+        f"Причина перехода: {data['club_reason']}\n"
+        f"Пожелания: {data['wishes']}\n\n"
+    )
+
+        await message.bot.send_message(
+        ADMIN_ID,
+        f"Новая заявка!\n\n"
+        f"Username: @{username}\n"
+        f"Telegram ID: {telegram_id}\n\n"
+        f"Направление: {data['service']}\n"
+        f"Тренер: {trainer}\n\n"
+        f"Имя: {data['name']}\n"
+        f"Возраст: {data['age']}\n"
+        f"Опыт: {data['experience']}\n"
+        f"Об опыте: {data['experience_details']}\n"
+        f"Телефон: {data['phone']}\n\n"
+        f"Телефон: {data['phone']}\n\n"
+        f"Причина перехода: {data['club_reason']}\n"
+        f"Пожелания: {data['wishes']}\n\n"
+
+    )
+
+
 
     else:
 

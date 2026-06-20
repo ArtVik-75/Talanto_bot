@@ -8,7 +8,8 @@ class Form(StatesGroup):
     name = State()
     child_name = State()
     age = State()
-
+    
+    club_reason = State()
     experience = State()
     experience_details = State()
 
