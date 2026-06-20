@@ -385,8 +385,6 @@ async def get_wishes(message: Message, state: FSMContext):
         data["experience_details"],
         data["phone"],
         data["club_reason"],
-        data["days"],
-        data["time"],
         data["wishes"]
         )
 
