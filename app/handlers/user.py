@@ -1,5 +1,5 @@
 from aiogram import Router
-from aiogram.filters import CommandStart
+from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram import F
 from aiogram.fsm.context import FSMContext
@@ -17,13 +17,27 @@ from app.constants.services import INDIVIDUAL
 from app.constants.services import LATINA
 from app.constants.services import CHILDREN
 from app.constants.services import TRANSFER
-from app.google_sheets import add_application
+from app.google_sheets import add_application, get_all_applications
 from app.config import ADMIN_ID
 
 router = Router()
 
+@router.message(Command("admin"))
+async def admin_test(message: Message):
 
-@router.message(CommandStart())
+    if message.from_user.id != ADMIN_ID:
+
+        return await message.answer(
+            "❌ Доступ запрещен"
+        )
+
+    applications = get_all_applications()
+    last_application = applications[-1]
+
+    await message.answer(str(last_application))
+
+
+@router.message(Command("start"))
 async def cmd_start(message: Message):
     await message.answer(
         "Добро пожаловать в Таланто! \n\nВыберите дейтсвие, которое вам необходимо:",
@@ -288,10 +302,12 @@ async def get_phone(message: Message, state: FSMContext):
         )
 
     elif data["service"] == CHILDREN:
-
         await state.set_state(Form.group_days)
 
-        await message.answer("У нас есть две группы, выберите подходящую вам по дням из списка", reply_markup=group_keyboard)
+        await message.answer(
+            "У нас есть две группы, выберите подходящую вам по дням из списка",
+            reply_markup=group_keyboard,
+        )
 
     else:
         await state.set_state(Form.days)
@@ -299,7 +315,7 @@ async def get_phone(message: Message, state: FSMContext):
         await message.answer(
             "Какие дни вам удобны для занятий?\n\n"
             "Например: Пн, Вт или Будние дни после 18:00",
-            reply_markup=menu_keyboard
+            reply_markup=menu_keyboard,
         )
 
 
@@ -310,7 +326,9 @@ async def get_group_days(message: Message, state: FSMContext):
 
     await state.set_state(Form.wishes)
 
-    await message.answer("Будут ли у вас какие-то пожелания?", reply_markup=menu_keyboard)
+    await message.answer(
+        "Будут ли у вас какие-то пожелания?", reply_markup=menu_keyboard
+    )
 
 
 @router.message(Form.club_reason)

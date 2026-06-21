@@ -57,3 +57,6 @@ def add_application(
             wishes,
         ]
     )
+
+def get_all_applications():
+    return sheet.get_all_records()
