@@ -12,6 +12,7 @@ from app.keyboards.latina import latina_keyboard
 from app.keyboards.experience import experience_keyboard
 from app.keyboards.menu import menu_keyboard
 from app.keyboards.group import group_keyboard
+from app.keyboards.admin import admin_keyboard
 from app.states.form import Form
 from app.constants.services import INDIVIDUAL
 from app.constants.services import LATINA
@@ -31,10 +32,54 @@ async def admin_test(message: Message):
             "❌ Доступ запрещен"
         )
 
-    applications = get_all_applications()
-    last_application = applications[-1]
+    await message.answer(
+        "⚙️ Панель администратора",
+        reply_markup=admin_keyboard
+    )
 
-    await message.answer(str(last_application))
+@router.message(F.text == "📋 Заявки")
+async def admin_applications(message: Message):
+
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ Доступ запрещен")
+    
+    applications = get_all_applications()
+
+    last_applications = applications[-10:]
+
+    text = "📋 Последние заявки\n\n"
+
+    for number, application in enumerate(last_applications, start=1):
+
+        text += (
+            f"{number}. {application['Имя']} | "
+            f"{application['Услуга']} | "
+            f"{application['Дата']}\n"
+        )
+
+    await message.answer(text)
+
+    await message.answer("📋 Раздел заявок")
+
+@router.message(F.text == "📊 Статистика")
+async def admin_stats(message: Message):
+    
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ Доступ запрещен")
+    
+    await message.answer("📊 Раздел статистики")
+
+@router.message(F.text == "🏠 Главное меню")
+async def admin_exit(message: Message):
+
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ Доступ запрещен")
+    
+    await message.answer(
+        "Главное меню",
+        reply_markup=menu_keyboard
+    )
+
 
 
 @router.message(Command("start"))
