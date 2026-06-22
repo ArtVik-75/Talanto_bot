@@ -1,8 +1,8 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-admin_application_keyboard = ReplyKeyboardMarkup(
+applications_pages_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="⬅️ К списку заявок")],
+        [KeyboardButton(text="⬅️ Назад"), KeyboardButton(text="➡️ Далее")],
         [KeyboardButton(text="🏠 Главное меню администратора")]
     ],
     resize_keyboard=True
