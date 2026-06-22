@@ -5,5 +5,5 @@ admin_application_keyboard = ReplyKeyboardMarkup(
         [KeyboardButton(text="⬅️ К списку заявок")],
         [KeyboardButton(text="🏠 Главное меню")]
     ],
-    rexize_keyboard=True
+    resize_keyboard=True
 )

@@ -69,6 +69,14 @@ async def admin_applications(message: Message, state: FSMContext):
 @router.message(AdminForm.application_number)
 async def admim_application_details(message: Message, state: FSMContext):
 
+    if message.text == "🏠 Главное меню":
+        await state.clear()
+
+        return await message.answer(
+            "Главное меню администратора:",
+            reply_markup=admin_keyboard
+        )
+
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
     
@@ -100,11 +108,9 @@ async def admim_application_details(message: Message, state: FSMContext):
     )
 
     await message.answer(text, reply_markup=admin_application_keyboard)
+
+    await state.clear()
     
-    
-
-
-
 
 @router.message(F.text == "📊 Статистика")
 async def admin_stats(message: Message, state: FSMContext):
@@ -120,13 +126,12 @@ async def admin_exit(message: Message, state: FSMContext):
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
     
+    await state.clear()
+    
     await message.answer(
         "Главное меню",
-        reply_markup=admin_keyboard
+        reply_markup=menu_keyboard
     )
-
-    await state.clear()
-
 
 
 @router.message(Command("start"))
