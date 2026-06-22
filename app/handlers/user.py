@@ -99,7 +99,7 @@ async def admim_application_details(message: Message, state: FSMContext):
         f"🏆 Причина перехода: {application['Причина перехода']}"
     )
 
-    await message.answer(text, admin_application_keyboard)
+    await message.answer(text, reply_markup=admin_application_keyboard)
     
     
 
