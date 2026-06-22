@@ -4,7 +4,7 @@ admin_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="📋 Заявки")],
         [KeyboardButton(text="📊 Статистика")],
-        [KeyboardButton(text="🏠 Главное меню")]
+        [KeyboardButton(text="🏠 Главное меню")],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
 )

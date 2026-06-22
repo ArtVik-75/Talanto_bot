@@ -14,6 +14,7 @@ from app.keyboards.menu import menu_keyboard
 from app.keyboards.group import group_keyboard
 from app.keyboards.admin import admin_keyboard
 from app.states.form import Form
+from app.states.adminform import AdminForm
 from app.constants.services import INDIVIDUAL
 from app.constants.services import LATINA
 from app.constants.services import CHILDREN
@@ -38,7 +39,7 @@ async def admin_test(message: Message):
     )
 
 @router.message(F.text == "📋 Заявки")
-async def admin_applications(message: Message):
+async def admin_applications(message: Message, state: FSMContext):
 
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
@@ -59,7 +60,36 @@ async def admin_applications(message: Message):
 
     await message.answer(text)
 
-    await message.answer("📋 Раздел заявок")
+    await state.set_state(AdminForm.application_number)
+
+    await message.answer("Введите номер заявки для просмотра подробной информации:")
+
+
+@router.message(AdminForm.application_number)
+async def admim_application_details(message: Message, state: FSMContext):
+
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ Доступ запрещен")
+    
+    if not message.text.isdigit():
+        return await message.answer("Ошибка! Введите номер заявки цифрами")
+    
+    application_number = int(message.text)
+
+    applications = get_all_applications()
+    last_applications = applications[-10:]
+
+    if application_number < 1 or application_number > len(last_applications):
+        return await message.answer("Ошибка! Введите корректный номер заявки из списка")
+    
+    application = last_applications[application_number -1]
+
+    await message.answer(str(application))
+    await state.clear()
+    
+
+
+
 
 @router.message(F.text == "📊 Статистика")
 async def admin_stats(message: Message):
