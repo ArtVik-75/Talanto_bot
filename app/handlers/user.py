@@ -84,8 +84,22 @@ async def admim_application_details(message: Message, state: FSMContext):
     
     application = last_applications[application_number -1]
 
-    await message.answer(str(application))
-    await state.clear()
+    text = (
+        f"📋 Заявка\n\n"
+        f"Telegram ID: {application['Telegram ID']}\n"
+        f"Username: {application['Username']}\n"
+        f"👤 Имя: {application['Имя']}\n"
+        f"👨‍👩‍👦 Имя ребенка: {application['Имя ребенка']}\n"
+        f"📚 Услуга: {application['Услуга']}\n"
+        f"📅 Дата: {application['Дата']}\n"
+        f"📞 Телефон: {application['Телефон']}\n"
+        f"🎓 Опыт: {application['Опыт']}\n"
+        f"📝 Об опыте: {application['Об опыте']}\n"
+        f"🏆 Причина перехода: {application['Причина перехода']}"
+    )
+
+    await message.answer(text)
+    
     
 
 
@@ -312,6 +326,7 @@ async def get_experience(message: Message, state: FSMContext):
         )
 
     else:
+
         await message.answer(
             "Пожалуйста, воспользуйтесь кнопками ниже", reply_markup=experience_keyboard
         )
