@@ -99,18 +99,8 @@ async def back_to_application(message: Message, state: FSMContext):
 
     await show_applications_page(message, applications, page=0)
 
-    text = "📋 Последние заявки\n\n"
-
-    for number, application in enumerate(applications, start=1):
-        text += (
-            f"{number}. {application['Имя']} | "
-            f"{application['Услуга']}"
-            f"{application['Дата']}\n"
-        )
-
     await state.set_state(AdminForm.application_number)
 
-    await message.answer(text)
     await message.answer("Введите номер заявки для просмотра подробной информации:")
 
 
@@ -138,6 +128,10 @@ async def admin_applications(message: Message, state: FSMContext):
     await show_applications_page(message, applications, page=0)
 
     await state.set_state(AdminForm.application_number)
+
+    await message.answer(
+        "Для подробного ознакомления с заявкой введите ее номер цифрой"
+    )
 
 
 @router.message(AdminForm.application_number, F.text.regexp(r"^\d+$"))
