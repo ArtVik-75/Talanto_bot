@@ -26,93 +26,22 @@ from app.config import ADMIN_ID
 
 router = Router()
 
+
 @router.message(Command("admin"))
 async def admin_test(message: Message):
 
     if message.from_user.id != ADMIN_ID:
-
-        return await message.answer(
-            "❌ Доступ запрещен"
-        )
-
-    await message.answer(
-        "⚙️ Панель администратора",
-        reply_markup=admin_keyboard
-    )
-
-@router.message(F.text == "📋 Заявки")
-async def admin_applications(message: Message, state: FSMContext):
-
-    if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
-    
-    applications = get_all_applications()
 
-    applications = applications[::-1]
+    await message.answer("⚙️ Панель администратора", reply_markup=admin_keyboard)
 
-    await state.update_data(page=0)
-
-    await show_applications_page(
-        message,
-        applications,
-        page=0
-    )
-
-    await state.set_state(AdminForm.application_number)
-
-
-@router.message(AdminForm.application_number)
-async def admim_application_details(message: Message, state: FSMContext):
-
-    if message.text == "🏠 Главное меню":
-        await state.clear()
-
-        return await message.answer(
-            "Главное меню администратора:",
-            reply_markup=admin_keyboard
-        )
-
-    if message.from_user.id != ADMIN_ID:
-        return await message.answer("❌ Доступ запрещен")
-    
-    if not message.text.isdigit():
-        return await message.answer("Ошибка! Введите номер заявки цифрами")
-    
-    application_number = int(message.text)
-
-    applications = get_all_applications()
-    applications = applications[::-1] 
-
-    if application_number < 1 or application_number > len(applications):
-        return await message.answer("Ошибка! Введите корректный номер заявки из списка")
-    
-    application = applications[application_number - 1]
-
-    text = (
-        f"📋 Заявка\n\n"
-        f"Telegram ID: {application['Telegram ID']}\n"
-        f"Username: {application['Username']}\n"
-        f"👤 Имя: {application['Имя']}\n"
-        f"👨‍👩‍👦 Имя ребенка: {application['Имя ребенка']}\n"
-        f"📚 Услуга: {application['Услуга']}\n"
-        f"📅 Дата: {application['Дата']}\n"
-        f"📞 Телефон: {application['Телефон']}\n"
-        f"🎓 Опыт: {application['Опыт']}\n"
-        f"📝 Об опыте: {application['Об опыте']}\n"
-        f"🏆 Причина перехода: {application['Причина перехода']}"
-    )
-
-    await message.answer(text, reply_markup=admin_application_keyboard)
-
-    await state.clear()
-
-@router.message(F.text == "➡️ Далее")
+@router.message(AdminForm.application_number, F.text == "➡️ Далее")
 async def next_page(message: Message, state: FSMContext):
 
     data = await state.get_data()
-    
+
     page = data.get("page", 0)
-    
+
     applications = get_all_applications()
     applications = applications[::-1]
 
@@ -128,7 +57,7 @@ async def next_page(message: Message, state: FSMContext):
     await show_applications_page(message, applications, page)
 
 
-@router.message(F.text == "⬅️ Назад")
+@router.message(AdminForm.application_number, F.text == "⬅️ Назад")
 async def last_page(message: Message, state: FSMContext):
 
     data = await state.get_data()
@@ -148,51 +77,110 @@ async def last_page(message: Message, state: FSMContext):
     await show_applications_page(message, applications, page)
 
 
-@router.message(F.text == "🏠 Главное меню админимтратора")
+@router.message(AdminForm.application_number, F.text == "🏠 Главное меню администратора")
 async def admin_exit(message: Message, state: FSMContext):
 
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
-    
-    await state.clear()
-    
-    await message.answer(
-        "Главное меню администратора",
-        reply_markup=admin_keyboard
-    )
 
-@router.message(F.text == "⬅️ К списку заявок")
+    await state.clear()
+
+    await message.answer("Главное меню администратора", reply_markup=admin_keyboard)
+
+
+@router.message(AdminForm.application_number, F.text == "⬅️ К списку заявок")
 async def back_to_application(message: Message, state: FSMContext):
 
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
-    
+
     applications = get_all_applications()
-    last_applications = applications[-10:]
+    applications = applications[::-1]
+
+    await show_applications_page(message, applications, page=0)
 
     text = "📋 Последние заявки\n\n"
 
-    for number, application in enumerate(last_applications, state=1):
+    for number, application in enumerate(applications, start=1):
         text += (
             f"{number}. {application['Имя']} | "
-            f"{application['Услуга']}" 
+            f"{application['Услуга']}"
             f"{application['Дата']}\n"
         )
 
     await state.set_state(AdminForm.application_number)
 
     await message.answer(text)
-    await message.answer(
-        "Введите номер заявки для просмотра подробной информации:"
-    )
+    await message.answer("Введите номер заявки для просмотра подробной информации:")
+
 
 @router.message(F.text == "📊 Статистика")
 async def admin_stats(message: Message, state: FSMContext):
-    
+
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
-    
+
     await message.answer("📊 Раздел статистики")
+
+
+@router.message(F.text == "📋 Заявки")
+async def admin_applications(message: Message, state: FSMContext):
+
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ Доступ запрещен")
+
+    applications = get_all_applications()
+
+    applications = applications[::-1]
+
+    await state.update_data(page=0)
+
+    await show_applications_page(message, applications, page=0)
+
+    await state.set_state(AdminForm.application_number)
+
+
+@router.message(AdminForm.application_number, F.text.regexp(r"^\d+$"))
+async def admim_application_details(message: Message, state: FSMContext):
+
+    if message.text == "🏠 Главное меню администратора":
+        await state.clear()
+
+        return await message.answer(
+            "Главное меню администратора:", reply_markup=admin_keyboard
+        )
+
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ Доступ запрещен")
+
+    if not message.text.isdigit():
+        return await message.answer("Ошибка! Введите номер заявки цифрами")
+
+    application_number = int(message.text)
+
+    applications = get_all_applications()
+    applications = applications[::-1]
+
+    if application_number < 1 or application_number > len(applications):
+        return await message.answer("Ошибка! Введите корректный номер заявки из списка")
+
+    application = applications[application_number - 1]
+
+    text = (
+        f"📋 Заявка\n\n"
+        f"Telegram ID: {application['Telegram ID']}\n"
+        f"Username: {application['Username']}\n"
+        f"👤 Имя: {application['Имя']}\n"
+        f"👨‍👩‍👦 Имя ребенка: {application['Имя ребенка']}\n"
+        f"📚 Услуга: {application['Услуга']}\n"
+        f"📅 Дата: {application['Дата']}\n"
+        f"📞 Телефон: {application['Телефон']}\n"
+        f"🎓 Опыт: {application['Опыт']}\n"
+        f"📝 Об опыте: {application['Об опыте']}\n"
+        f"🏆 Причина перехода: {application['Причина перехода']}"
+    )
+
+    await message.answer(text, reply_markup=admin_application_keyboard)
 
 
 @router.message(Command("start"))
@@ -395,7 +383,6 @@ async def get_experience(message: Message, state: FSMContext):
         )
 
     else:
-
         await message.answer(
             "Пожалуйста, воспользуйтесь кнопками ниже", reply_markup=experience_keyboard
         )
