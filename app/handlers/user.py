@@ -110,7 +110,29 @@ async def admin_stats(message: Message, state: FSMContext):
     if message.from_user.id != ADMIN_ID:
         return await message.answer("❌ Доступ запрещен")
 
-    await message.answer("📊 Раздел статистики")
+    applications = get_all_applications()
+    total_applications = len(applications)
+
+    services = {}
+
+    for application in applications:
+        service = application["Услуга"]
+
+        if service not in services:
+            services[service] = 0
+        
+        services[service] += 1
+
+    text = (
+        f"📊 Статистика\n\n"
+        f"📋 Всего заявок: {total_applications}\n\n"
+    )
+
+    for service, count in services.items():
+
+        text += f"{service}: {count}\n"
+        
+    await message.answer(text)
 
 
 @router.message(F.text == "📋 Заявки")
