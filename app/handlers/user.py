@@ -192,6 +192,7 @@ async def admim_application_details(message: Message, state: FSMContext):
 
     text = (
         f"📋 Заявка\n\n"
+        f"📌 Статус: {application['Статус']}\n\n"
         f"Telegram ID: {application['Telegram ID']}\n"
         f"Username: {application['Username']}\n"
         f"👤 Имя: {application['Имя']}\n"
@@ -587,6 +588,7 @@ async def get_wishes(message: Message, state: FSMContext):
         days,
         time,
         data["wishes"],
+        "🟡 Новая"
     )
 
     if data["service"] == CHILDREN:

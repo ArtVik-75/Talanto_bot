@@ -35,6 +35,7 @@ def add_application(
     days,
     time,
     wishes,
+    status
 ):
 
     sheet.append_row(
@@ -55,6 +56,7 @@ def add_application(
             days,
             time,
             wishes,
+            status
         ]
     )
 
