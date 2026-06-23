@@ -4,6 +4,7 @@ from aiogram.types import Message
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram import Bot
+from datetime import datetime
 
 from app.keyboards.reply import main_keyboard
 from app.keyboards.services import services_keyboard
@@ -114,6 +115,8 @@ async def admin_stats(message: Message, state: FSMContext):
     total_applications = len(applications)
 
     services = {}
+    today = datetime.now().strftime("%d.%m.%Y")
+    today_applications = 0
 
     for application in applications:
         service = application["Услуга"]
@@ -123,9 +126,14 @@ async def admin_stats(message: Message, state: FSMContext):
         
         services[service] += 1
 
+        if application["Дата"].startswith(today):
+            today_applications += 1
+
     text = (
         f"📊 Статистика\n\n"
         f"📋 Всего заявок: {total_applications}\n\n"
+        f"📅 Сегодня: {today_applications}\n\n"
+        f"📚 По направлениям:\n"
     )
 
     for service, count in services.items():
