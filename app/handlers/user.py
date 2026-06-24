@@ -199,6 +199,8 @@ async def admin_rejected(message: Message, state: FSMContext):
 
     update_application_status(application_number, "🔴 Отказ")
 
+    await message.answer("✅ Статус обновлён")
+
 
 @router.message(AdminForm.application_number, F.text.regexp(r"^\d+$"))
 async def admim_application_details(message: Message, state: FSMContext):
