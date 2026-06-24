@@ -4,6 +4,7 @@ import gspread
 from datetime import datetime
 
 from google.oauth2.service_account import Credentials
+from app.config import STATUS_COLUMN
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -62,3 +63,14 @@ def add_application(
 
 def get_all_applications():
     return sheet.get_all_records()
+
+def update_application_status(application_number, status):
+    
+    applications = get_all_applications()
+
+    real_index = len(applications) - application_number
+
+    sheet_row = real_index + 2
+
+    sheet.update_cell(sheet_row, STATUS_COLUMN, status)
+

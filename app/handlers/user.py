@@ -22,7 +22,7 @@ from app.constants.services import INDIVIDUAL
 from app.constants.services import LATINA
 from app.constants.services import CHILDREN
 from app.constants.services import TRANSFER
-from app.google_sheets import add_application, get_all_applications
+from app.google_sheets import add_application, get_all_applications, update_application_status
 from app.config import ADMIN_ID
 
 router = Router()
@@ -35,6 +35,7 @@ async def admin_test(message: Message):
         return await message.answer("❌ Доступ запрещен")
 
     await message.answer("⚙️ Панель администратора", reply_markup=admin_keyboard)
+
 
 @router.message(AdminForm.application_number, F.text == "➡️ Далее")
 async def next_page(message: Message, state: FSMContext):
@@ -78,7 +79,9 @@ async def last_page(message: Message, state: FSMContext):
     await show_applications_page(message, applications, page)
 
 
-@router.message(AdminForm.application_number, F.text == "🏠 Главное меню администратора")
+@router.message(
+    AdminForm.application_number, F.text == "🏠 Главное меню администратора"
+)
 async def admin_exit(message: Message, state: FSMContext):
 
     if message.from_user.id != ADMIN_ID:
@@ -123,7 +126,7 @@ async def admin_stats(message: Message, state: FSMContext):
 
         if service not in services:
             services[service] = 0
-        
+
         services[service] += 1
 
         if application["Дата"].startswith(today):
@@ -137,9 +140,8 @@ async def admin_stats(message: Message, state: FSMContext):
     )
 
     for service, count in services.items():
-
         text += f"{service}: {count}\n"
-        
+
     await message.answer(text)
 
 
@@ -162,6 +164,40 @@ async def admin_applications(message: Message, state: FSMContext):
     await message.answer(
         "Для подробного ознакомления с заявкой введите ее номер цифрой"
     )
+
+
+@router.message(AdminForm.application_number, F.text == "🟢 Записан")
+async def admin_status(message: Message, state: FSMContext):
+
+    data = await state.get_data()
+
+    application_number = data["application_number"]
+
+    update_application_status(application_number, "🟢 Записан")
+
+    await message.answer("✅ Статус обновлен")
+
+
+@router.message(AdminForm.application_number, F.text == "🔵 Связались")
+async def admin_contacted(message: Message, state: FSMContext):
+
+    data = await state.get_data()
+
+    application_number = data["application_number"]
+
+    update_application_status(application_number, "🔵 Связались")
+
+    await message.answer("✅ Статус обновлён")
+
+
+@router.message(AdminForm.application_number, F.text == "🔴 Отказ")
+async def admin_rejected(message: Message, state: FSMContext):
+
+    data = await state.get_data()
+
+    application_number = data["application_number"]
+
+    update_application_status(application_number, "🔴 Отказ")
 
 
 @router.message(AdminForm.application_number, F.text.regexp(r"^\d+$"))
@@ -204,6 +240,8 @@ async def admim_application_details(message: Message, state: FSMContext):
         f"📝 Об опыте: {application['Об опыте']}\n"
         f"🏆 Причина перехода: {application['Причина перехода']}"
     )
+
+    await state.update_data(application_number=application_number)
 
     await message.answer(text, reply_markup=admin_application_keyboard)
 
@@ -588,7 +626,7 @@ async def get_wishes(message: Message, state: FSMContext):
         days,
         time,
         data["wishes"],
-        "🟡 Новая"
+        "🟡 Новая",
     )
 
     if data["service"] == CHILDREN:
